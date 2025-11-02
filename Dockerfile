@@ -71,7 +71,7 @@ RUN mkdir -p /app/logs /app/uploads && \
     chown -R flask:flask /app/logs /app/uploads
 
 # Install netcat for health checks
-RUN apt-get update && apt-get install -y --no-install-recommends netcat && \
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 # Set proper permissions

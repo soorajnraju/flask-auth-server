@@ -63,7 +63,7 @@ services:
       SECRET_KEY: ${SECRET_KEY:-your-super-secret-key-change-this-in-production}
       
       # Database Configuration
-      DATABASE_URL: postgresql://${POSTGRES_USER:-flask_user}:${POSTGRES_PASSWORD:-secure_password_change_me}@db:5432/${POSTGRES_DB:-flask_auth}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-flask_user}:${POSTGRES_PASSWORD:-secure_password_change_me}@db:5432/${POSTGRES_DB:-flask_auth}
       
       # JWT Configuration
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-super-secret-jwt-key-change-this-in-production}

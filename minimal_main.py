@@ -19,7 +19,7 @@ def create_minimal_app():
     
     # Basic configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/flask')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql+psycopg://postgres:postgres@localhost:5432/flask')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # JWT Configuration - Use same secret as main server
