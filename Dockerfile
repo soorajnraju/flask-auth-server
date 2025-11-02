@@ -2,7 +2,7 @@
 # Multi-stage build for optimized image size and security
 
 # Build stage
-FROM python:3.11-slim-bullseye AS builder
+FROM python:3.13-slim-bookworm AS builder
 
 # Set build arguments
 ARG BUILD_DATE
@@ -38,7 +38,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Production stage
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bookworm
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \

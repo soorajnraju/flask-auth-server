@@ -14,7 +14,7 @@
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.13+
 - PostgreSQL 12+ (running on localhost:5432)
 - Virtual environment activated
 
@@ -418,7 +418,7 @@ CORS_ORIGINS=https://yourapp.com,https://admin.yourapp.com
 
 ### Docker Deployment
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 

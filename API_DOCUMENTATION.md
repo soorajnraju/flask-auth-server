@@ -408,7 +408,7 @@ gunicorn -w 4 -b 0.0.0.0:5001 main:app
 ### Docker Deployment
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 COPY requirements.txt .

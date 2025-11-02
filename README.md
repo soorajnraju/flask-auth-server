@@ -1,6 +1,6 @@
 # 🛡️ Enterprise Flask Authorization Server
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.13-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0%2B-green.svg)](https://flask.palletsprojects.com)
 [![JWT](https://img.shields.io/badge/JWT-Authentication-orange.svg)](https://jwt.io)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue.svg)](https://postgresql.org)
@@ -273,7 +273,7 @@ curl -X POST http://localhost:5001/api/v1/auth/login \
 
 ## 📋 Getting Started Checklist
 
-- [ ] **Prerequisites**: Python 3.8+, PostgreSQL running
+- [ ] **Prerequisites**: Python 3.13+, PostgreSQL running
 - [ ] **Setup**: Virtual environment activated, dependencies installed
 - [ ] **Database**: `python init_db.py` completed successfully
 - [ ] **Server**: `python simple_main.py` running on port 5001
