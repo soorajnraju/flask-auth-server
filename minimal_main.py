@@ -2,7 +2,8 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 import os
-from config import config
+from datetime import timedelta
+from dotenv import load_dotenv
 from app.models import init_db
 from app.models.auth import BlacklistedToken
 
@@ -10,21 +11,37 @@ from app.models.auth import BlacklistedToken
 from app.controllers.auth_controller import auth_bp
 from app.controllers.rbac_controller import rbac_bp
 
-def create_simple_app(config_name=None):
-    """Simplified application factory pattern without Redis dependencies."""
-    if config_name is None:
-        config_name = os.getenv('FLASK_ENV', 'development')
-    
+load_dotenv()
+
+def create_minimal_app():
+    """Minimal application without any Redis dependencies."""
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    
+    # Basic configuration
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/flask')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # JWT Configuration - Use same secret as main server
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-super-secret-jwt-key-change-this-in-production')
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
+    app.config['JWT_BLACKLIST_ENABLED'] = True
+    app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+    app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    app.config['JWT_HEADER_NAME'] = 'Authorization'
+    app.config['JWT_HEADER_TYPE'] = 'Bearer'
+    
+    # Security
+    app.config['BCRYPT_LOG_ROUNDS'] = 12
+    app.config['PASSWORD_MIN_LENGTH'] = 8
+    
+    # CORS
+    app.config['CORS_ORIGINS'] = ['http://localhost:3000']
     
     # Initialize extensions
     db = init_db(app)
-    
-    # JWT Manager
     jwt = JWTManager(app)
-    
-    # CORS
     CORS(app, origins=app.config['CORS_ORIGINS'])
     
     # JWT Configuration
@@ -81,61 +98,11 @@ def create_simple_app(config_name=None):
             'version': '1.0.0'
         }), 200
     
-    # API Info endpoint
-    @app.route('/api/v1/info')
-    def api_info():
-        """API information endpoint."""
-        return jsonify({
-            'success': True,
-            'api': {
-                'name': 'Enterprise Authorization Server',
-                'version': '1.0.0',
-                'description': 'Enterprise-grade Flask API with JWT authentication and RBAC',
-                'endpoints': {
-                    'auth': '/api/v1/auth',
-                    'rbac': '/api/v1/rbac'
-                },
-                'features': [
-                    'JWT Authentication',
-                    'Role-Based Access Control (RBAC)',
-                    'User Management',
-                    'Permission Management',
-                    'Token Blacklisting',
-                    'CORS Support',
-                    'Password Security',
-                    'API Versioning'
-                ]
-            }
-        }), 200
-    
-    # Error handlers
-    @app.errorhandler(404)
-    def not_found(error):
-        """Handle 404 errors."""
-        return jsonify({
-            'success': False,
-            'message': 'Endpoint not found'
-        }), 404
-    
-    @app.errorhandler(405)
-    def method_not_allowed(error):
-        """Handle 405 errors."""
-        return jsonify({
-            'success': False,
-            'message': 'Method not allowed'
-        }), 405
-    
-    @app.errorhandler(500)
-    def internal_error(error):
-        """Handle 500 errors."""
-        return jsonify({
-            'success': False,
-            'message': 'Internal server error'
-        }), 500
-    
     return app
 
 if __name__ == '__main__':
-    app = create_simple_app()
-    print("Starting Enterprise Authorization Server (Simplified)...")
+    app = create_minimal_app()
+    print("🚀 Starting Minimal Enterprise Authorization Server...")
+    print("📍 Server will be available at: http://localhost:5001")
+    print("🔐 Admin credentials: admin@example.com / Admin123!")
     app.run(debug=True, host='127.0.0.1', port=5001)

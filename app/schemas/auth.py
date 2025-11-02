@@ -1,5 +1,29 @@
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields, validate, validates, ValidationError, pre_load
 import re
+
+def validate_password_strength(password):
+    """Validate password strength requirements."""
+    errors = []
+    
+    if len(password) < 8:
+        errors.append('Password must be at least 8 characters long')
+    
+    if not re.search(r'[A-Z]', password):
+        errors.append('Password must contain at least one uppercase letter')
+    
+    if not re.search(r'[a-z]', password):
+        errors.append('Password must contain at least one lowercase letter')
+    
+    if not re.search(r'\d', password):
+        errors.append('Password must contain at least one digit')
+    
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        errors.append('Password must contain at least one special character')
+    
+    if errors:
+        raise ValidationError(errors)
+    
+    return password
 
 class UserRegistrationSchema(Schema):
     """Schema for user registration."""
@@ -8,27 +32,9 @@ class UserRegistrationSchema(Schema):
         validate.Length(min=3, max=80),
         validate.Regexp(r'^[a-zA-Z0-9_]+$', error='Username must contain only letters, numbers, and underscores')
     ])
-    password = fields.Str(required=True, validate=validate.Length(min=8))
+    password = fields.Str(required=True, validate=[validate.Length(min=8), validate_password_strength])
     first_name = fields.Str(required=True, validate=validate.Length(min=1, max=50))
     last_name = fields.Str(required=True, validate=validate.Length(min=1, max=50))
-    
-    @validates('password')
-    def validate_password(self, value):
-        """Validate password strength."""
-        if len(value) < 8:
-            raise ValidationError('Password must be at least 8 characters long')
-        
-        if not re.search(r'[A-Z]', value):
-            raise ValidationError('Password must contain at least one uppercase letter')
-        
-        if not re.search(r'[a-z]', value):
-            raise ValidationError('Password must contain at least one lowercase letter')
-        
-        if not re.search(r'\d', value):
-            raise ValidationError('Password must contain at least one digit')
-        
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
-            raise ValidationError('Password must contain at least one special character')
 
 class UserLoginSchema(Schema):
     """Schema for user login."""
@@ -48,27 +54,9 @@ class UserUpdateSchema(Schema):
     is_verified = fields.Bool()
 
 class PasswordChangeSchema(Schema):
-    """Schema for password change."""
-    old_password = fields.Str(required=True)
-    new_password = fields.Str(required=True, validate=validate.Length(min=8))
-    
-    @validates('new_password')
-    def validate_new_password(self, value):
-        """Validate new password strength."""
-        if len(value) < 8:
-            raise ValidationError('Password must be at least 8 characters long')
-        
-        if not re.search(r'[A-Z]', value):
-            raise ValidationError('Password must contain at least one uppercase letter')
-        
-        if not re.search(r'[a-z]', value):
-            raise ValidationError('Password must contain at least one lowercase letter')
-        
-        if not re.search(r'\d', value):
-            raise ValidationError('Password must contain at least one digit')
-        
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
-            raise ValidationError('Password must contain at least one special character')
+    """Schema for changing password."""
+    current_password = fields.Str(required=True)
+    new_password = fields.Str(required=True, validate=[validate.Length(min=8), validate_password_strength])
 
 class RoleSchema(Schema):
     """Schema for role operations."""

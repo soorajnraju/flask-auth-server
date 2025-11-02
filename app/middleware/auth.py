@@ -20,14 +20,20 @@ def token_required(f):
                     'message': 'Token has been revoked'
                 }), 401
             
-            # Get current user
+            # Get current user (convert string ID back to int)
             current_user_id = get_jwt_identity()
-            current_user = User.query.get(current_user_id)
+            current_user = User.query.get(int(current_user_id))
             
-            if not current_user or not current_user.is_active:
+            if not current_user:
                 return jsonify({
                     'success': False,
-                    'message': 'User not found or inactive'
+                    'message': f'User not found with ID: {current_user_id}'
+                }), 401
+                
+            if not current_user.is_active:
+                return jsonify({
+                    'success': False,
+                    'message': 'User account is inactive'
                 }), 401
             
             # Add current_user to kwargs for easy access in routes
@@ -35,9 +41,14 @@ def token_required(f):
             
             return f(*args, **kwargs)
         except Exception as e:
+            # Better error reporting for debugging
+            import traceback
+            print(f"JWT Middleware Error: {str(e)}")
+            print(f"Error type: {type(e).__name__}")
+            traceback.print_exc()
             return jsonify({
                 'success': False,
-                'message': 'Invalid token'
+                'message': f'Invalid token: {str(e)}'
             }), 401
     
     return decorated
@@ -102,7 +113,7 @@ def optional_token(f):
             user_id = get_jwt_identity()
             
             if user_id:
-                current_user = User.query.get(user_id)
+                current_user = User.query.get(int(user_id))
                 kwargs['current_user'] = current_user
             else:
                 kwargs['current_user'] = None

@@ -53,9 +53,9 @@ class AuthService:
         # Update last login
         user.last_login = datetime.now(timezone.utc)
         
-        # Create tokens
+        # Create tokens (convert user.id to string for JWT compatibility)
         access_token = create_access_token(
-            identity=user.id,
+            identity=str(user.id),
             additional_claims={
                 'email': user.email,
                 'username': user.username,
@@ -64,7 +64,7 @@ class AuthService:
             }
         )
         
-        refresh_token = create_refresh_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         # Store refresh token
         AuthService.store_refresh_token(refresh_token, user.id)
@@ -90,9 +90,9 @@ class AuthService:
         if not user or not user.is_active:
             return {'success': False, 'message': 'User not found or inactive'}, 401
         
-        # Create new access token
+        # Create new access token (convert user.id to string for JWT compatibility)
         access_token = create_access_token(
-            identity=user.id,
+            identity=str(user.id),
             additional_claims={
                 'email': user.email,
                 'username': user.username,
