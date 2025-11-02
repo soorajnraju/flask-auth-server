@@ -212,13 +212,26 @@ Response:
 
 ## 🚀 Production Deployment
 
-### 🐳 Docker
+### 🐳 Docker Deployment (Recommended)
+
+**Quick Start with Docker Compose:**
 ```bash
-docker build -t auth-server .
-docker run -p 5001:5001 auth-server
+# 1. Setup environment
+cp .env.docker .env
+# Edit .env with secure passwords
+
+# 2. Start all services (Flask + PostgreSQL + Redis)
+docker-compose up -d
+
+# 3. Test deployment
+curl http://localhost:5001/health
 ```
 
-### 🔧 Environment Variables
+**📖 [Complete Docker Guide →](DOCKER_GUIDE.md)** - Comprehensive Docker deployment with PostgreSQL, Redis, Nginx, and production configurations.
+
+### 🔧 Manual Deployment
+
+**Environment Variables:**
 ```bash
 JWT_SECRET_KEY=your-256-bit-secret
 DATABASE_URL=postgresql://user:pass@host:5432/db
@@ -226,11 +239,9 @@ REDIS_URL=redis://host:6379/0  # Optional
 FLASK_ENV=production
 ```
 
-### 🌐 Reverse Proxy (Nginx)
-```nginx
-location /auth/ {
-    proxy_pass http://auth-server:5001/;
-}
+**Production Server:**
+```bash
+gunicorn --workers 4 --bind 0.0.0.0:5001 minimal_main:create_minimal_app()
 ```
 
 **📖 [Complete Deployment Guide →](COMPLETE_DOCUMENTATION.md#production-deployment)**
